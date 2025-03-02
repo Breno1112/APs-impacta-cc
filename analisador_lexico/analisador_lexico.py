@@ -18,28 +18,34 @@ class AnalisadorLexico:
             self.linha += 1
         return c
 
-    def get_linha(self):
-        return self.linha + 1
-
-    def get_coluna(self):
-        return self.pos_visual + 1
-
     def monta_atomo(self, text):
         return {
             "lexama": text
         }
     
     def retrair(self):
+        c = self.codigo_fonte[self.pos]
+        if c == '\n':
+            self.linha -= 1
         self.pos -= 1
 
     def proximo_atomo(self):
+        was_using_alpha = False
+        was_using_numeric = False
         c = self.proximo_char()
         if c is None:
             return None
         while c not in self.limitadores and c is not None:
-            print(c.isalpha() or c.isnumeric())
-            self.carry += c
-            c = self.proximo_char()
+            if c.isalpha():
+                was_using_alpha = True
+            elif c.isnumeric():
+                was_using_numeric = True
+            if (not c.isalpha() and not c.isnumeric()) and (was_using_alpha or was_using_numeric):
+                self.retrair()
+                c = None
+            else:
+                self.carry += c
+                c = self.proximo_char()
         temp = self.carry
         self.carry = ""
         return temp
