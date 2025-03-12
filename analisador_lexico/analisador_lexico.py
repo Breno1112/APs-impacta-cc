@@ -89,11 +89,15 @@ class AnalisadorLexico:
     
     def verifica_identificadores(self):
         c = self.proximo_char()
+        if c == '\n':
+            self.linha += 1
         carry = ""
         continuar = c is not None and (c.isalpha() or c == '_') # na primeira posição do identificador é apenas letra ou underline
         while continuar:
             carry += c
             c = self.proximo_char()
+            if c == '\n':
+                self.linha += 1
             continuar = c is not None and (c.isalpha() or c.isnumeric() or c == '_') # se o tamanho do identificador for maior que 20, retornar erro
         if carry == "":
             return None
@@ -149,9 +153,13 @@ class AnalisadorLexico:
         c = self.proximo_char()
         if c is None:
             return None
+        if c == '\n':
+            self.linha += 1
 
         while atomo is None and c in self.limitadores:
             c = self.proximo_char()
+            if c == '\n':
+                self.linha += 1
         self.retrair()
         atomo_identificador = self.verifica_identificadores()
         if atomo_identificador is not None:
@@ -172,6 +180,8 @@ class AnalisadorLexico:
             else:
                 atomo += c
             c = self.proximo_char()
+            if c == '\n':
+                self.linha += 1
             continuar = c is not None and c not in self.limitadores
         atomo_numerico = self.tratar_numeros(atomo)
         if atomo_numerico is not None:
@@ -181,3 +191,5 @@ class AnalisadorLexico:
             return excecao_tratada
         return {'atomo': 'NAO_ENCONTRADO', 'lexema': atomo}
                 
+    def last_line(self):
+        return self.linha + 1
