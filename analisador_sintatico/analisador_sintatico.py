@@ -10,6 +10,7 @@ class AnalisadorSintatico:
 
         self.quantidade_begins = 0
         self.quantidade_ends = 0
+        self.quantidade_programs = 0
         self.atomo_atual = None
 
 
@@ -38,10 +39,37 @@ class AnalisadorSintatico:
         self.pegar_proximo_atomo()
         if self.atomo_atual['atomo'] != proximo_atomo_esperado:
             raise RuntimeError('Erro sintático: Esperado [{}] encontrado [{}] na linha {}'.format(proximo_atomo_esperado, self.atomo_atual['atomo'], self.atomo_atual['linha']))
-        else:
-            self.imprime_atomo_atual()
+        self.imprime_atomo_atual()
+
+    def garantir_atomo_atual_especifico(self, atomo_esperado):
+        if self.atomo_atual['atomo'] != atomo_esperado:
+            raise RuntimeError('Erro sintático: Esperado [{}] encontrado [{}] na linha {}'.format(atomo_esperado, self.atomo_atual['atomo'], self.atomo_atual['linha']))
+        self.imprime_atomo_atual()
 
     def analisar_palavra_reservada_program(self):
+        if self.quantidade_programs > 0:
+            raise RuntimeError('Erro sintático: Encontrado [{}] na linha {}. O programa só pode ter um identificador'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
         self.imprime_atomo_atual()
+        self.quantidade_programs += 1
         self.verificar_e_direcionar_e_validar_proximo_atomo('IDENTIF')
+        # Agora preciso validar se após o primeiro identificador nós temos parênteses e mais identificadores
+        # pega o próximo átomo
+        # se for parênteses aberto
+        # enquanto não chegar no parênteses fechado, 
+        # garantir que o átomo seguinte é IDENTIF
+        # pegar o próximo
+        # se o próximo não for PARENTESES_FECHADO
+        # garantir que é virgula
+        # pegar o próximo
+        self.pegar_proximo_atomo()
+        if self.atomo_atual['atomo'] == 'PARENTESES_ABERTO':
+            self.imprime_atomo_atual()
+            while self.atomo_atual['atomo'] != 'PARENTESES_FECHADO':
+                self.verificar_e_direcionar_e_validar_proximo_atomo('IDENTIF')
+                self.pegar_proximo_atomo()
+                if self.atomo_atual['atomo'] != 'VIRGULA':
+                    self.garantir_atomo_atual_especifico('PARENTESES_FECHADO')
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+        self.garantir_atomo_atual_especifico('PONTO_VIRG')
         
