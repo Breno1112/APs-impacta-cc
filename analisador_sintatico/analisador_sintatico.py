@@ -16,3 +16,6 @@ class AnalisadorSintatico:
             print('Linha: {} - Atomo: {}    lexema: {}'.format(atomo['linha'], atomo['atomo'], atomo['lexema']))
             atomo = self.analisador_lexico.proximo_atomo()
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
+
+
+#teste
