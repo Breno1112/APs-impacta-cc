@@ -115,8 +115,8 @@ class AnalisadorLexico:
             return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': atomo}
         elif atomo == ':=':
             return {'linha': self.linha + 1, 'atomo': 'ATRIB', 'lexema': atomo}
-        elif atomo == ',':
-            return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': atomo}
+        # elif atomo == ',':
+        #     return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': atomo}
         elif atomo == '<':
             return {'linha': self.linha + 1, 'atomo': 'MENOR_QUE', 'lexema': atomo}
         elif atomo == '<=':
@@ -152,6 +152,8 @@ class AnalisadorLexico:
             return {'linha': self.linha + 1, 'atomo': 'PARENTESES_FECHADO', 'lexema': c}
         elif c == ';':
             return {'linha': self.linha + 1, 'atomo': 'PONTO_VIRG', 'lexema': c}
+        elif c == ',':
+            return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': c}
         return None
 
     def proximo_atomo(self):
