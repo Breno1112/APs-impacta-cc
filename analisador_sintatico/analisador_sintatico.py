@@ -104,6 +104,12 @@ class AnalisadorSintatico:
             self.analisar_comando_if()
         elif self.atomo_atual['atomo'] == 'READ':
             self.analisar_comando_de_entrada()
+        elif self.atomo_atual['atomo'] == 'WHILE':
+            self.analisar_comando_while()
+        elif self.atomo_atual['atomo'] == 'WRITE':
+            self.analisar_comando_de_saida()
+        elif self.atomo_atual['atomo'] == 'BEGIN':
+            self.analisar_comando_composto()
             
 
 
