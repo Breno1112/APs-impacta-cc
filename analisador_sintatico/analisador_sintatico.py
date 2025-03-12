@@ -23,11 +23,10 @@ class AnalisadorSintatico:
         self.pegar_proximo_atomo()
         if self.atomo_atual['atomo'] == 'VAR':
             self.analisar_declaracao_variaveis()
-        self.garantir_atomo_atual_especifico('BEGIN')
-        self.pegar_proximo_atomo()
-        while self.atomo_atual is not None:
-            self.imprime_atomo_atual()
-            self.pegar_proximo_atomo()
+        self.analisar_comando_composto()
+        # while self.atomo_atual is not None:
+        #     self.imprime_atomo_atual()
+        #     self.pegar_proximo_atomo()
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
     
     def imprime_atomo_atual(self):
@@ -95,31 +94,60 @@ class AnalisadorSintatico:
         self.imprime_atomo_atual()
 
     def analisar_comando(self):
-        pass
+        if self.atomo_atual['atomo'] == 'IDENTIF':
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+            if self.atomo_atual['atomo'] == 'ATRIB':
+                self.imprime_atomo_atual()
+                self.analisar_expressao()
+        elif self.atomo_atual['atomo'] == 'IF':
+            self.analisar_comando_if()
+        elif self.atomo_atual['atomo'] == 'READ':
+            self.analisar_comando_de_entrada()
+            
 
-    def analisar_atribuicao(self):
-        pass
 
     def analisar_comando_de_entrada(self):
-        pass
+        self.garantir_atomo_atual_especifico('READ')
+        self.verificar_e_direcionar_e_validar_proximo_atomo('PARENTESES_ABERTO')
+        self.pegar_proximo_atomo()
+        self.validar_lista_identificadores()
+        self.garantir_atomo_atual_especifico('PARENTESES_FECHADO')
 
     def analisar_comando_de_saida(self):
         pass
 
     def analisar_comando_if(self):
-        pass
+        self.garantir_atomo_atual_especifico('IF')
+        self.pegar_proximo_atomo()
+        self.analisar_expressao()
+        self.garantir_atomo_atual_especifico('THEN')
+        self.pegar_proximo_atomo()
+        self.analisar_comando()
+        if self.atomo_atual['atomo'] == 'ELSE':
+            self.garantir_atomo_atual_especifico('THEN')
+            self.pegar_proximo_atomo()
+            self.analisar_comando()
+
 
     def analisar_comando_while(self):
         pass
 
     def analisar_comando_composto(self):
+        self.garantir_atomo_atual_especifico('BEGIN')
+        self.pegar_proximo_atomo()
+        self.analisar_comando()
+        self.pegar_proximo_atomo()
+        while self.atomo_atual['atomo'] == 'PONTO_VIRG':
+            self.garantir_atomo_atual_especifico('PONTO_VIRG')
+            self.pegar_proximo_atomo()
+            self.analisar_comando()
+            self.pegar_proximo_atomo()
+        self.garantir_atomo_atual_especifico('END')
         pass
 
     def analisar_expressao(self):
-        pass
-
-    def analisar_operador_relacional(self):
-        pass
+        self.analisar_expressao_simples()
 
     def analisar_operador_relacional(self):
         if self.atomo_atual['atomo'] not in ('MENOR_QUE', 'MENOR_IGUAL', 'IGUAL', 'DIFERENTE_DE', 'MAIOR_QUE', 'MAIOR_IGUAL'):
@@ -127,18 +155,34 @@ class AnalisadorSintatico:
         self.imprime_atomo_atual()
 
     def analisar_operador_adicao(self):
-        if self.atomo_atual['atomo'] not in ('ADICAO', 'SUBTRACAO', 'OR'):
+        if not self.is_operador_adicao():
             raise RuntimeError('Erro sintático: Esperado [ADICAO] ou [SUBTRACAO] ou [OR] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
         self.imprime_atomo_atual()
+    
+    def is_operador_adicao(self):
+        return self.atomo_atual['atomo'] in ('ADICAO', 'SUBTRACAO', 'OR')
 
     def analisar_expressao_simples(self):
-        pass
+        if self.atomo_atual['atomo'] in ('SOMA', 'SUBTRACAO'):
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+        self.analisar_termo()
+        while self.is_operador_adicao():
+            self.analisar_operador_adicao()
+            self.analisar_termo()
 
     def analisar_termo(self):
-        pass
+        self.analisar_fator()
+        while self.is_operador_multiplicacao():
+            self.analisar_operador_multiplicacao()
+            self.pegar_proximo_atomo()
+            self.analisar_fator()
+
+    def is_operador_multiplicacao(self):
+        return self.atomo_atual['atomo'] in ('MULTIPLICACAO', 'DIVISAO', 'DIV', 'MOD', 'AND')
 
     def analisar_operador_multiplicacao(self):
-        if self.atomo_atual['atomo'] not in ('MULTIPLICACAO', 'DIVISAO', 'DIV', 'MOD', 'AND'):
+        if not self.is_operador_multiplicacao():
             raise RuntimeError('Erro sintático: Esperado [MULTIPLICACAO] ou [DIVISAO] ou [DIV] ou [MOD] ou [AND] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
         self.imprime_atomo_atual()
 
