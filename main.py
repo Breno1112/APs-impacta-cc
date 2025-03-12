@@ -7,6 +7,6 @@ arquivo.close()
 
 atomo = lex.proximo_atomo()
 while atomo is not None:
-    print(f'Atomo: {atomo}')
+    print('Atomo: {}    lexema: {}'.format(atomo['atomo'], atomo['lexema']))
     atomo = lex.proximo_atomo()
 print('fim do arquivo')

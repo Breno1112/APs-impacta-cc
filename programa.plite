@@ -4,3 +4,4 @@ begin
 num := 10
 write(num)
 end
+
