@@ -4,7 +4,7 @@ class AnalisadorLexico:
         self.linha = 0
         self.pos = 0
         self.limitadores = (' ', '\n', '\t', '\r')
-        self.palavras_reservadas = ('begin', 'boolean', 'div', 'do', 'else', 'end', 'false', 'if', 'integer', 'mod', 'program', 'read', 'then', 'true', 'not', 'var', 'while', 'write')
+        self.palavras_reservadas = ('begin', 'boolean', 'div', 'do', 'else', 'end', 'false', 'if', 'integer', 'mod', 'program', 'read', 'then', 'true', 'not', 'var', 'while', 'write', 'or', 'div', 'mod', 'and')
 
     def imprime_codigo_fonte(self):
         print(self.codigo_fonte)
