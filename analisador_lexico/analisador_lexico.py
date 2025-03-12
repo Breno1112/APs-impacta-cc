@@ -6,7 +6,8 @@ class AnalisadorLexico:
         self.carry = ""
         self.limitadores = (' ', '\n', '\t', '\r')
         self.palavras_reservadas = ('begin', 'boolean', 'div', 'do', 'else', 'end', 'false', 'if', 'integer', 'mod', 'program', 'read', 'then', 'true', 'not', 'var', 'while', 'write')
-    
+        self.caracteres_especiais = ('(', ')', ';')
+
     def imprime_codigo_fonte(self):
         print(self.codigo_fonte)
 
@@ -112,41 +113,48 @@ class AnalisadorLexico:
         return None
     
     def tratar_excecao(self, atomo):
-        if atomo == ';':
-            return {'atomo': 'PONTO_VIRG', 'lexema': atomo}
-        elif atomo == ':':
-            return {'atomo': 'DOIS_PONTOS', 'lexema': atomo}
+        if atomo == ':':
+            return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': atomo}
         elif atomo == ':=':
-            return {'atomo': 'ATRIB', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'ATRIB', 'lexema': atomo}
         elif atomo == ',':
-            return {'atomo': 'VIRGULA', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': atomo}
         elif atomo == '<':
-            return {'atomo': 'MENOR_QUE', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MENOR_QUE', 'lexema': atomo}
         elif atomo == '<=':
-            return {'atomo': 'MENOR_IGUAL', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MENOR_IGUAL', 'lexema': atomo}
         elif atomo == '==':
-            return {'atomo': 'COMPARACAO', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'COMPARACAO', 'lexema': atomo}
         elif atomo == '>':
-            return {'atomo': 'MAIOR_QUE', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MAIOR_QUE', 'lexema': atomo}
         elif atomo == '>=':
-            return {'atomo': 'MAIOR_IGUAL', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MAIOR_IGUAL', 'lexema': atomo}
         elif atomo == '<>':
-            return {'atomo': 'DIFERENTE_DE', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'DIFERENTE_DE', 'lexema': atomo}
         elif atomo == '+' or atomo == 'or':
-            return {'atomo': 'SOMA', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'SOMA', 'lexema': atomo}
         elif atomo == '-':
-            return {'atomo': 'SUBTRACAO', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'SUBTRACAO', 'lexema': atomo}
         elif atomo == '/':
-            return {'atomo': 'DIVISAO', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'DIVISAO', 'lexema': atomo}
         elif atomo == '*':
-            return {'atomo': 'MULTIPLICACAO', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MULTIPLICACAO', 'lexema': atomo}
         elif atomo == '|':
-            return {'atomo': 'MODULO', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'MODULO', 'lexema': atomo}
         return None
     
     def tratar_numeros(self, atomo):
         if atomo.isnumeric():
-            return {'atomo': 'NUM', 'lexema': atomo}
+            return {'linha': self.linha + 1, 'atomo': 'NUM', 'lexema': atomo}
+        
+    def tratar_caracter_especial(self, c):
+        if c == '(':
+            return {'linha': self.linha + 1, 'atomo': 'PARENTESES_ABERTO', 'lexema': c}
+        elif c == ')':
+            return {'linha': self.linha + 1, 'atomo': 'PARENTESES_FECHADO', 'lexema': c}
+        elif c == ';':
+            return {'linha': self.linha + 1, 'atomo': 'PONTO_VIRG', 'lexema': c}
+        return None
 
     def proximo_atomo(self):
         atomo = None
@@ -167,12 +175,14 @@ class AnalisadorLexico:
                 return {'error': 'Erro sintático na linha {}: Tamanho do identificador não pode ser maior que 20 caracteres'.format(self.linha)}
             palavra_reservada = self.verifica_palavras_reservadas(atomo_identificador)
             if palavra_reservada is not None:
-                return {'atomo': palavra_reservada, 'lexema': atomo_identificador}
-            return {'atomo': 'IDENTIF', 'lexema': atomo_identificador}
+                return {'linha': self.linha + 1, 'atomo': palavra_reservada, 'lexema': atomo_identificador}
+            return {'linha': self.linha + 1, 'atomo': 'IDENTIF', 'lexema': atomo_identificador}
         # Verificar por identificadores
         # Verificar por palavras reservadas
         # Verificar por números
-
+        caracter_especial_tratado = self.tratar_caracter_especial(c)
+        if caracter_especial_tratado is not None:
+            return caracter_especial_tratado
         continuar = c is not None and c not in self.limitadores
         while continuar:
             if atomo is None:
@@ -189,7 +199,7 @@ class AnalisadorLexico:
         excecao_tratada = self.tratar_excecao(atomo)
         if excecao_tratada is not None:
             return excecao_tratada
-        return {'atomo': 'NAO_ENCONTRADO', 'lexema': atomo}
+        return {'linha': self.linha + 1, 'atomo': 'NAO_ENCONTRADO', 'lexema': atomo}
                 
     def last_line(self):
         return self.linha + 1

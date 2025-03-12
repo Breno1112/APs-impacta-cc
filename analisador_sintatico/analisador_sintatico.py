@@ -13,6 +13,6 @@ class AnalisadorSintatico:
         while atomo is not None:
             if atomo.get('error') is not None:
                 raise RuntimeError(atomo['error'])
-            print('Atomo: {}    lexema: {}'.format(atomo['atomo'], atomo['lexema']))
+            print('Linha: {} - Atomo: {}    lexema: {}'.format(atomo['linha'], atomo['atomo'], atomo['lexema']))
             atomo = self.analisador_lexico.proximo_atomo()
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
