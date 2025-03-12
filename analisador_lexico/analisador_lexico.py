@@ -155,6 +155,8 @@ class AnalisadorLexico:
         self.retrair()
         atomo_identificador = self.verifica_identificadores()
         if atomo_identificador is not None:
+            if len(atomo_identificador) > 20:
+                return {'error': 'Erro sintático na linha {}: Tamanho do identificador não pode ser maior que 20 caracteres'.format(self.linha)}
             palavra_reservada = self.verifica_palavras_reservadas(atomo_identificador)
             if palavra_reservada is not None:
                 return {'atomo': palavra_reservada, 'lexema': atomo_identificador}
