@@ -90,5 +90,49 @@ class AnalisadorSintatico:
             raise RuntimeError('Erro sintático: Esperado [INTEGER] ou [BOOLEAN] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
         self.imprime_atomo_atual()
 
+    def analisar_comando(self):
+        pass
+
+    def analisar_atribuicao(self):
+        pass
+
+    def analisar_comando_de_entrada(self):
+        pass
+
+    def analisar_comando_de_saida(self):
+        pass
+
+    def analisar_comando_if(self):
+        pass
+
+    def analisar_comando_while(self):
+        pass
+
+    def analisar_comando_composto(self):
+        pass
+
+    def analisar_expressao(self):
+        pass
+
+    def analisar_operador_relacional(self):
+        pass
+
+    def analisar_operador_relacional(self):
+        pass
+
+    def analisar_operador_adicao(self):
+        pass
+
+    def analisar_expressao_simples(self):
+        pass
+
+    def analisar_termo(self):
+        pass
+
+    def analisar_operador_multiplicacao(self):
+        pass
+
+    def analisar_fator(self):
+        pass
 
         
