@@ -122,10 +122,14 @@ class AnalisadorSintatico:
         pass
 
     def analisar_operador_relacional(self):
-        pass
+        if self.atomo_atual['atomo'] not in ('MENOR_QUE', 'MENOR_IGUAL', 'IGUAL', 'DIFERENTE_DE', 'MAIOR_QUE', 'MAIOR_IGUAL'):
+            raise RuntimeError('Erro sintático: Esperado [MENOR_QUE] ou [MENOR_IGUAL] ou [IGUAL] ou [DIFERENTE_DE] ou [MAIOR_QUE] ou [MAIOR_IGUAL] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
+        self.imprime_atomo_atual()
 
     def analisar_operador_adicao(self):
-        pass
+        if self.atomo_atual['atomo'] not in ('ADICAO', 'SUBTRACAO', 'OR'):
+            raise RuntimeError('Erro sintático: Esperado [ADICAO] ou [SUBTRACAO] ou [OR] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
+        self.imprime_atomo_atual()
 
     def analisar_expressao_simples(self):
         pass
@@ -134,7 +138,9 @@ class AnalisadorSintatico:
         pass
 
     def analisar_operador_multiplicacao(self):
-        pass
+        if self.atomo_atual['atomo'] not in ('MULTIPLICACAO', 'DIVISAO', 'DIV', 'MOD', 'AND'):
+            raise RuntimeError('Erro sintático: Esperado [MULTIPLICACAO] ou [DIVISAO] ou [DIV] ou [MOD] ou [AND] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
+        self.imprime_atomo_atual()
 
     def analisar_fator(self):
         pass
