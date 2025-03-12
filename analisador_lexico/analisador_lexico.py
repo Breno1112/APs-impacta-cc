@@ -90,14 +90,15 @@ class AnalisadorLexico:
     def verifica_identificadores(self):
         c = self.proximo_char()
         carry = ""
-        continuar = c.isalpha() or c == '_' # na primeira posição do identificador é apenas letra ou underline
+        continuar = c is not None and (c.isalpha() or c == '_') # na primeira posição do identificador é apenas letra ou underline
         while continuar:
             carry += c
             c = self.proximo_char()
-            continuar = c.isalpha() or c.isnumeric() or c == '_' # se o tamanho do identificador for maior que 20, retornar erro
+            continuar = c is not None and (c.isalpha() or c.isnumeric() or c == '_') # se o tamanho do identificador for maior que 20, retornar erro
         if carry == "":
             return None
-        self.retrair()
+        if c is not None:
+            self.retrair()
         return carry
     
 
