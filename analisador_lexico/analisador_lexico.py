@@ -3,10 +3,8 @@ class AnalisadorLexico:
         self.codigo_fonte = codigo_fonte
         self.linha = 0
         self.pos = 0
-        self.carry = ""
         self.limitadores = (' ', '\n', '\t', '\r')
         self.palavras_reservadas = ('begin', 'boolean', 'div', 'do', 'else', 'end', 'false', 'if', 'integer', 'mod', 'program', 'read', 'then', 'true', 'not', 'var', 'while', 'write')
-        self.caracteres_especiais = ('(', ')', ';')
 
     def imprime_codigo_fonte(self):
         print(self.codigo_fonte)

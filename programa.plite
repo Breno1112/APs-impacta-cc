@@ -1,7 +1,7 @@
 (*programa le dois números
 inteiros e encontra o maior*)
 
-program ex02(teste,;
+program ex02;
 var num1, num2: integer;
 _maior : integer;
 begin
