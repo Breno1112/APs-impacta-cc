@@ -31,9 +31,9 @@ class AnalisadorLexico:
         return c
 
     def verifica_comentario_linha(self):
-        c = self.codigo_fonte[self.pos]
         if self.pos >= len(self.codigo_fonte) -1:
             return False
+        c = self.codigo_fonte[self.pos]
         carry = c + self.codigo_fonte[self.pos + 1]
         return carry == '//'
 
@@ -46,6 +46,8 @@ class AnalisadorLexico:
         self.linha += 1
     
     def verifica_comentario_tipo_a(self):
+        if self.pos >= len(self.codigo_fonte) -1:
+            return False
         c = self.codigo_fonte[self.pos]
         return c == '{'
     
@@ -59,9 +61,9 @@ class AnalisadorLexico:
         self.pos += 1
     
     def verifica_comentario_tipo_b(self):
-        c = self.codigo_fonte[self.pos]
         if self.pos >= len(self.codigo_fonte) -1:
             return False
+        c = self.codigo_fonte[self.pos]
         carry = c + self.codigo_fonte[self.pos + 1]
         return carry == '(*'
     
@@ -103,21 +105,52 @@ class AnalisadorLexico:
         if atomo in self.palavras_reservadas:
             return atomo.upper()
         return None
+    
+    def tratar_excecao(self, atomo):
+        if atomo == ';':
+            return {'atomo': 'PONTO_VIRG', 'lexema': atomo}
+        elif atomo == ':':
+            return {'atomo': 'DOIS_PONTOS', 'lexema': atomo}
+        elif atomo == ':=':
+            return {'atomo': 'ATRIB', 'lexema': atomo}
+        elif atomo == ',':
+            return {'atomo': 'VIRGULA', 'lexema': atomo}
+        elif atomo == '<':
+            return {'atomo': 'MENOR_QUE', 'lexema': atomo}
+        elif atomo == '<=':
+            return {'atomo': 'MENOR_IGUAL', 'lexema': atomo}
+        elif atomo == '==':
+            return {'atomo': 'COMPARACAO', 'lexema': atomo}
+        elif atomo == '>':
+            return {'atomo': 'MAIOR_QUE', 'lexema': atomo}
+        elif atomo == '>=':
+            return {'atomo': 'MAIOR_IGUAL', 'lexema': atomo}
+        elif atomo == '<>':
+            return {'atomo': 'DIFERENTE_DE', 'lexema': atomo}
+        elif atomo == '+' or atomo == 'or':
+            return {'atomo': 'SOMA', 'lexema': atomo}
+        elif atomo == '-':
+            return {'atomo': 'SUBTRACAO', 'lexema': atomo}
+        elif atomo == '/':
+            return {'atomo': 'DIVISAO', 'lexema': atomo}
+        elif atomo == '*':
+            return {'atomo': 'MULTIPLICACAO', 'lexema': atomo}
+        elif atomo == '|':
+            return {'atomo': 'MODULO', 'lexema': atomo}
+        return None
+    
+    def tratar_numeros(self, atomo):
+        if atomo.isnumeric():
+            return {'atomo': 'NUM', 'lexema': atomo}
 
     def proximo_atomo(self):
         atomo = None
         c = self.proximo_char()
         if c is None:
             return None
-        alfa = c.isalpha()
-        numero = c.isnumeric()
-        especial = not c.isalpha() and not c.isnumeric()
 
         while atomo is None and c in self.limitadores:
             c = self.proximo_char()
-            alfa = c.isalpha()
-            numero = c.isnumeric()
-            especial = not c.isalpha() and not c.isnumeric()
         self.retrair()
         atomo_identificador = self.verifica_identificadores()
         if atomo_identificador is not None:
@@ -137,5 +170,11 @@ class AnalisadorLexico:
                 atomo += c
             c = self.proximo_char()
             continuar = c is not None and c not in self.limitadores
+        atomo_numerico = self.tratar_numeros(atomo)
+        if atomo_numerico is not None:
+            return atomo_numerico
+        excecao_tratada = self.tratar_excecao(atomo)
+        if excecao_tratada is not None:
+            return excecao_tratada
         return {'atomo': 'TESTE2', 'lexema': atomo}
                 
