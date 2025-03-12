@@ -111,9 +111,9 @@ class AnalisadorLexico:
         return None
     
     def tratar_excecao(self, atomo):
-        if atomo == ':':
-            return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': atomo}
-        elif atomo == ':=':
+        # if atomo == ':':
+        #     return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': atomo}
+        if atomo == ':=':
             return {'linha': self.linha + 1, 'atomo': 'ATRIB', 'lexema': atomo}
         # elif atomo == ',':
         #     return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': atomo}
@@ -154,6 +154,8 @@ class AnalisadorLexico:
             return {'linha': self.linha + 1, 'atomo': 'PONTO_VIRG', 'lexema': c}
         elif c == ',':
             return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': c}
+        elif c == ':':
+            return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': c}
         return None
 
     def proximo_atomo(self):

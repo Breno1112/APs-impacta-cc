@@ -13,6 +13,7 @@ class AnalisadorSintatico:
         self.quantidade_programs = 0
         self.atomo_atual = None
         self.penultimo_atomo = None
+        self.tipos = ('INTEGER', 'BOOLEAN')
 
 
     def analisar(self):
@@ -22,7 +23,6 @@ class AnalisadorSintatico:
         self.pegar_proximo_atomo()
         if self.atomo_atual['atomo'] == 'VAR':
             self.analisar_declaracao_variaveis()
-            self.pegar_proximo_atomo()
         self.garantir_atomo_atual_especifico('BEGIN')
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
     
@@ -53,6 +53,7 @@ class AnalisadorSintatico:
 
         if self.atomo_atual['atomo'] == 'PARENTESES_ABERTO':
             self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
             self.validar_lista_identificadores()
             self.garantir_atomo_atual_especifico('PARENTESES_FECHADO')
             self.pegar_proximo_atomo()
@@ -60,7 +61,6 @@ class AnalisadorSintatico:
 
 
     def validar_lista_identificadores(self):
-        self.pegar_proximo_atomo()
         while self.atomo_atual['atomo'] in ('IDENTIF', 'VIRGULA'):
             self.imprime_atomo_atual()
             self.pegar_proximo_atomo()
@@ -69,6 +69,26 @@ class AnalisadorSintatico:
     
     def analisar_declaracao_variaveis(self):
         self.garantir_atomo_atual_especifico('VAR')
+        self.pegar_proximo_atomo()
+        continuar = True
+        while continuar:
+            self.analisar_declaracao()
+            self.verificar_e_direcionar_e_validar_proximo_atomo('PONTO_VIRG')
+            self.pegar_proximo_atomo()
+            continuar = self.atomo_atual['atomo'] == 'IDENTIF'
+
+    
+    def analisar_declaracao(self):
         self.validar_lista_identificadores()
+        self.garantir_atomo_atual_especifico('DOIS_PONTOS')
+        self.garantir_tipo()
+
+
+    def garantir_tipo(self):
+        self.pegar_proximo_atomo()
+        if self.atomo_atual['atomo'] not in self.tipos:
+            raise RuntimeError('Erro sintático: Esperado [INTEGER] ou [BOOLEAN] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
+        self.imprime_atomo_atual()
+
 
         
