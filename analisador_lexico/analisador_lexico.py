@@ -155,7 +155,8 @@ class AnalisadorLexico:
         elif c == ',':
             return {'linha': self.linha + 1, 'atomo': 'VIRGULA', 'lexema': c}
         elif c == ':':
-            return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': c}
+            if self.pos <= len(self.codigo_fonte) - 1 and self.codigo_fonte[self.pos] != '=':
+                    return {'linha': self.linha + 1, 'atomo': 'DOIS_PONTOS', 'lexema': c}
         return None
 
     def proximo_atomo(self):

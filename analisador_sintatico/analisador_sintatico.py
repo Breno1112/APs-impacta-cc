@@ -24,6 +24,10 @@ class AnalisadorSintatico:
         if self.atomo_atual['atomo'] == 'VAR':
             self.analisar_declaracao_variaveis()
         self.garantir_atomo_atual_especifico('BEGIN')
+        self.pegar_proximo_atomo()
+        while self.atomo_atual is not None:
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
     
     def imprime_atomo_atual(self):
