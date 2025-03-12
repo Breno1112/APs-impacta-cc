@@ -177,5 +177,5 @@ class AnalisadorLexico:
         excecao_tratada = self.tratar_excecao(atomo)
         if excecao_tratada is not None:
             return excecao_tratada
-        return {'atomo': 'TESTE2', 'lexema': atomo}
+        return {'atomo': 'NAO_ENCONTRADO', 'lexema': atomo}
                 
