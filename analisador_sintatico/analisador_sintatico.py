@@ -99,6 +99,7 @@ class AnalisadorSintatico:
             self.pegar_proximo_atomo()
             if self.atomo_atual['atomo'] == 'ATRIB':
                 self.imprime_atomo_atual()
+                self.pegar_proximo_atomo()
                 self.analisar_expressao()
         elif self.atomo_atual['atomo'] == 'IF':
             self.analisar_comando_if()
@@ -131,7 +132,7 @@ class AnalisadorSintatico:
         self.pegar_proximo_atomo()
         self.analisar_comando()
         if self.atomo_atual['atomo'] == 'ELSE':
-            self.garantir_atomo_atual_especifico('THEN')
+            self.garantir_atomo_atual_especifico('ELSE')
             self.pegar_proximo_atomo()
             self.analisar_comando()
 
@@ -148,15 +149,22 @@ class AnalisadorSintatico:
             self.garantir_atomo_atual_especifico('PONTO_VIRG')
             self.pegar_proximo_atomo()
             self.analisar_comando()
-            self.pegar_proximo_atomo()
         self.garantir_atomo_atual_especifico('END')
         pass
 
     def analisar_expressao(self):
         self.analisar_expressao_simples()
+        while self.is_operador_relacional():
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+            self.analisar_expressao_simples()
+
+    def is_operador_relacional(self):
+        return self.atomo_atual['atomo'] in ('MENOR_QUE', 'MENOR_IGUAL', 'IGUAL', 'DIFERENTE_DE', 'MAIOR_QUE', 'MAIOR_IGUAL')
+
 
     def analisar_operador_relacional(self):
-        if self.atomo_atual['atomo'] not in ('MENOR_QUE', 'MENOR_IGUAL', 'IGUAL', 'DIFERENTE_DE', 'MAIOR_QUE', 'MAIOR_IGUAL'):
+        if not self.is_operador_relacional():
             raise RuntimeError('Erro sintático: Esperado [MENOR_QUE] ou [MENOR_IGUAL] ou [IGUAL] ou [DIFERENTE_DE] ou [MAIOR_QUE] ou [MAIOR_IGUAL] encontrado [{}] na linha {}'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
         self.imprime_atomo_atual()
 
@@ -193,6 +201,12 @@ class AnalisadorSintatico:
         self.imprime_atomo_atual()
 
     def analisar_fator(self):
-        pass
+        if self.atomo_atual['atomo'] in ('IDENTIF', 'NUM', 'TRUE', 'FALSE'):
+            self.imprime_atomo_atual()
+        elif self.atomo_atual['atomo'] == 'NOT':
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+            self.analisar_fator()
+        self.pegar_proximo_atomo()
 
         
