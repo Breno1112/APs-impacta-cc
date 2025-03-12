@@ -12,27 +12,25 @@ class AnalisadorSintatico:
         self.quantidade_ends = 0
         self.quantidade_programs = 0
         self.atomo_atual = None
+        self.penultimo_atomo = None
 
 
     def analisar(self):
         self.pegar_proximo_atomo()
-        while self.atomo_atual is not None:
-            if self.atomo_atual.get('error') is not None:
-                raise RuntimeError(self.atomo_atual['error'])
-            self.verificar_e_direcionar_atomo()
+        self.garantir_atomo_atual_especifico('PROGRAM')
+        self.analisar_palavra_reservada_program()
+        self.pegar_proximo_atomo()
+        if self.atomo_atual['atomo'] == 'VAR':
+            self.analisar_declaracao_variaveis()
             self.pegar_proximo_atomo()
+        self.garantir_atomo_atual_especifico('BEGIN')
         print('{} linhas analisadas, programa sintaticamente correto.'.format(self.analisador_lexico.last_line()))
     
     def imprime_atomo_atual(self):
         print('Linha: {} - Atomo: {}    lexema: {}'.format(self.atomo_atual['linha'], self.atomo_atual['atomo'], self.atomo_atual['lexema']))
     
-    def verificar_e_direcionar_atomo(self):
-        if self.atomo_atual['atomo'] == 'PROGRAM':
-            self.analisar_palavra_reservada_program()
-        else:
-            self.imprime_atomo_atual()
-    
     def pegar_proximo_atomo(self):
+        self.penultimo_atomo = self.atomo_atual
         self.atomo_atual = self.analisador_lexico.proximo_atomo()
 
     def verificar_e_direcionar_e_validar_proximo_atomo(self, proximo_atomo_esperado):
@@ -49,27 +47,28 @@ class AnalisadorSintatico:
     def analisar_palavra_reservada_program(self):
         if self.quantidade_programs > 0:
             raise RuntimeError('Erro sintático: Encontrado [{}] na linha {}. O programa só pode ter um identificador'.format(self.atomo_atual['atomo'], self.atomo_atual['linha']))
-        self.imprime_atomo_atual()
         self.quantidade_programs += 1
         self.verificar_e_direcionar_e_validar_proximo_atomo('IDENTIF')
-        # Agora preciso validar se após o primeiro identificador nós temos parênteses e mais identificadores
-        # pega o próximo átomo
-        # se for parênteses aberto
-        # enquanto não chegar no parênteses fechado, 
-        # garantir que o átomo seguinte é IDENTIF
-        # pegar o próximo
-        # se o próximo não for PARENTESES_FECHADO
-        # garantir que é virgula
-        # pegar o próximo
         self.pegar_proximo_atomo()
+
         if self.atomo_atual['atomo'] == 'PARENTESES_ABERTO':
             self.imprime_atomo_atual()
-            while self.atomo_atual['atomo'] != 'PARENTESES_FECHADO':
-                self.verificar_e_direcionar_e_validar_proximo_atomo('IDENTIF')
-                self.pegar_proximo_atomo()
-                if self.atomo_atual['atomo'] != 'VIRGULA':
-                    self.garantir_atomo_atual_especifico('PARENTESES_FECHADO')
-            self.imprime_atomo_atual()
+            self.validar_lista_identificadores()
+            self.garantir_atomo_atual_especifico('PARENTESES_FECHADO')
             self.pegar_proximo_atomo()
         self.garantir_atomo_atual_especifico('PONTO_VIRG')
+
+
+    def validar_lista_identificadores(self):
+        self.pegar_proximo_atomo()
+        while self.atomo_atual['atomo'] in ('IDENTIF', 'VIRGULA'):
+            self.imprime_atomo_atual()
+            self.pegar_proximo_atomo()
+        if self.penultimo_atomo['atomo'] == 'VIRGULA':
+            self.garantir_atomo_atual_especifico('IDENTIF')
+    
+    def analisar_declaracao_variaveis(self):
+        self.garantir_atomo_atual_especifico('VAR')
+        self.validar_lista_identificadores()
+
         
